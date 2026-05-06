@@ -2,6 +2,27 @@
 
 This document provides a comprehensive overview of the codebase, outlining the technologies used, architectural decisions, and state management strategies.
 
+## Getting Started
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Run the mock server:
+
+```bash
+cd mock-server
+node server.js
+```
+
+3. Start the frontend project:
+
+```bash
+npm run dev
+```
+
 ## Table of Contents
 
 -   [Tech Stack](#tech-stack)
