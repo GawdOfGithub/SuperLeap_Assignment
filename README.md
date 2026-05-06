@@ -19,6 +19,7 @@ node server.js
 The mock server starts on **http://localhost:4000** and serves all lead data in-memory. It resets on restart, so seed data is always fresh.
 
 > **Optional environment variables:**
+>
 > - `MOCK_LATENCY_MS=300` — adds 300ms artificial delay to every request (useful for testing loading states)
 > - `MOCK_FAILURE_RATE=0.1` — randomly fails 10% of requests with a 500 error (chaos mode)
 
@@ -35,14 +36,14 @@ The frontend starts on **http://localhost:5173**. Vite proxies all `/api/*` requ
 
 ### Available Scripts
 
-| Location | Command | Description |
-|---|---|---|
-| `mock-server/` | `node server.js` | Start the API server |
+| Location       | Command                  | Description                            |
+| -------------- | ------------------------ | -------------------------------------- |
+| `mock-server/` | `node server.js`         | Start the API server                   |
 | `mock-server/` | `node --watch server.js` | Start with auto-reload on file changes |
-| `mock-server/` | `node generate.js` | Regenerate the seed data file |
-| root | `npm run dev` | Start the Vite dev server |
-| root | `npm run build` | Build for production |
-| root | `npm run preview` | Preview the production build locally |
+| `mock-server/` | `node generate.js`       | Regenerate the seed data file          |
+| root           | `npm run dev`            | Start the Vite dev server              |
+| root           | `npm run build`          | Build for production                   |
+| root           | `npm run preview`        | Preview the production build locally   |
 
 ---
 
@@ -63,6 +64,7 @@ NEW → CONTACTED → QUALIFIED → CONVERTED
 ## Features
 
 ### List View (`/leads/list`)
+
 - Paginated, searchable table of all leads
 - Filter by one or more statuses simultaneously
 - Expand any row inline to preview full details without navigating away
@@ -71,6 +73,7 @@ NEW → CONTACTED → QUALIFIED → CONVERTED
 - Create, edit, and delete leads via modal forms
 
 ### Board View (`/leads/board`)
+
 - Kanban board with one column per pipeline stage
 - Drag and drop cards across columns to update status
 - Status transitions are validated — you can only drop a card in a valid next stage
@@ -78,6 +81,7 @@ NEW → CONTACTED → QUALIFIED → CONVERTED
 - Same search and filter controls as the list view
 
 ### Lead Detail Page (`/leads/:id`)
+
 - Full contact information — name, email, phone, source, timestamps
 - Status badge with available transition actions
 - Edit and delete from the detail page
@@ -87,18 +91,18 @@ NEW → CONTACTED → QUALIFIED → CONVERTED
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | React 19 + TypeScript |
-| Build Tool | Vite 7 |
+| Layer                 | Technology                      |
+| --------------------- | ------------------------------- |
+| Framework             | React 19 + TypeScript           |
+| Build Tool            | Vite 7                          |
 | State & Data Fetching | Redux Toolkit Query (RTK Query) |
-| Routing | React Router v7 |
-| Styling | Tailwind CSS v4 |
-| UI Components | Radix UI |
-| Drag and Drop | @hello-pangea/dnd |
-| Notifications | Sonner |
-| Icons | Lucide React |
-| Mock Backend | Express (Node.js) |
+| Routing               | React Router v7                 |
+| Styling               | Tailwind CSS v4                 |
+| UI Components         | Radix UI                        |
+| Drag and Drop         | @hello-pangea/dnd               |
+| Notifications         | Sonner                          |
+| Icons                 | Lucide React                    |
+| Mock Backend          | Express (Node.js)               |
 
 ---
 
@@ -116,13 +120,13 @@ src/store/index.ts  →  configureStore({ leadsApi.reducer })
 
 The mock server (`mock-server/server.js`) exposes a standard REST API:
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/leads` | Fetch all leads |
-| `GET` | `/leads/:id` | Fetch a single lead |
-| `POST` | `/leads` | Create a new lead |
-| `PATCH` | `/leads/:id` | Update a lead (including status) |
-| `DELETE` | `/leads/:id` | Delete a lead |
+| Method   | Endpoint     | Description                      |
+| -------- | ------------ | -------------------------------- |
+| `GET`    | `/leads`     | Fetch all leads                  |
+| `GET`    | `/leads/:id` | Fetch a single lead              |
+| `POST`   | `/leads`     | Create a new lead                |
+| `PATCH`  | `/leads/:id` | Update a lead (including status) |
+| `DELETE` | `/leads/:id` | Delete a lead                    |
 
 Swapping in a real backend only requires changing the `baseUrl` in `leadsApi.ts`. The Vite proxy config in `vite.config.ts` handles routing `/api/*` to the server, so no changes are needed in components.
 
@@ -132,11 +136,11 @@ Transition rules are defined once in `src/features/leads/constants/index.ts` and
 
 ```ts
 const VALID_TRANSITIONS = {
-  NEW:       ['CONTACTED', 'LOST'],
-  CONTACTED: ['QUALIFIED',  'LOST'],
-  QUALIFIED: ['CONVERTED',  'LOST'],
-  CONVERTED: [],   // terminal
-  LOST:      [],   // terminal
+  NEW: ["CONTACTED", "LOST"],
+  CONTACTED: ["QUALIFIED", "LOST"],
+  QUALIFIED: ["CONVERTED", "LOST"],
+  CONVERTED: [], // terminal
+  LOST: [], // terminal
 };
 ```
 
@@ -190,10 +194,20 @@ interface Lead {
   name: string;
   email: string;
   phone: string | null;
-  status: 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CONVERTED' | 'LOST';
-  source: 'website' | 'referral' | 'campaign' | 'linkedin' | 'cold-call'
-        | 'email' | 'trade-show' | 'partner' | 'event' | 'cold-outreach' | null;
-  created_at: string;  // ISO 8601
-  updated_at: string;  // ISO 8601
+  status: "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST";
+  source:
+    | "website"
+    | "referral"
+    | "campaign"
+    | "linkedin"
+    | "cold-call"
+    | "email"
+    | "trade-show"
+    | "partner"
+    | "event"
+    | "cold-outreach"
+    | null;
+  created_at: string; // ISO 8601
+  updated_at: string; // ISO 8601
 }
 ```

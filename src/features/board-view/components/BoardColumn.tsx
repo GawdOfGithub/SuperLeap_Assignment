@@ -1,6 +1,7 @@
-import React from 'react';
-import { Droppable } from '@hello-pangea/dnd';
+import React, { useRef } from 'react';
+import { Droppable, Draggable } from '@hello-pangea/dnd';
 import { useNavigate } from 'react-router-dom';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { COL_COLORS } from '@/features/leads/constants';
 import { LeadCard } from './LeadCard';
 import type { DropState } from '../utils/boardUtils';
@@ -15,6 +16,8 @@ const DROP_STATE_STYLES: Record<DropState, string> = {
   'invalid-hover':'ring-2 ring-red-400 bg-red-50/70',
 };
 
+const CARD_HEIGHT = 100; // estimated height of a card + margin
+
 interface BoardColumnProps {
   status: LeadStatus;
   leads: Lead[];
@@ -27,6 +30,14 @@ interface BoardColumnProps {
 export function BoardColumn({ status, leads, draggedLead, overColId, navigate, getDropState }: BoardColumnProps) {
   const col       = COL_COLORS[status];
   const dropState = getDropState(status, draggedLead, overColId);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: leads.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => CARD_HEIGHT,
+    overscan: 10,
+  });
 
   return (
     <div className={`flex flex-col rounded-xl border ${col.border} ${col.bg} w-72 shrink-0 transition-all ${DROP_STATE_STYLES[dropState]}`}>
@@ -37,10 +48,28 @@ export function BoardColumn({ status, leads, draggedLead, overColId, navigate, g
         </span>
       </div>
 
-      <Droppable droppableId={status}>
+      <Droppable
+        droppableId={status}
+        mode="virtual"
+        renderClone={(provided, snapshot, rubric) => {
+          const lead = leads[rubric.source.index];
+          return (
+            <div
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              <LeadCard lead={lead} index={rubric.source.index} navigate={navigate} />
+            </div>
+          );
+        }}
+      >
         {(provided, snapshot) => (
           <div
-            ref={provided.innerRef}
+            ref={(el) => {
+              provided.innerRef(el);
+              (scrollRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+            }}
             {...provided.droppableProps}
             className={`flex-1 overflow-y-auto p-2 min-h-[120px] max-h-[calc(100vh-220px)] transition-colors
               ${snapshot.isDraggingOver && dropState === 'valid-hover' ? 'bg-green-50' : ''}
@@ -49,15 +78,45 @@ export function BoardColumn({ status, leads, draggedLead, overColId, navigate, g
             {leads.length === 0 && !snapshot.isDraggingOver && (
               <p className="text-xs text-center text-gray-300 pt-4">No leads</p>
             )}
-            {leads.map((lead, i) => (
-              <LeadCard key={lead.id} lead={lead} index={i} navigate={navigate} />
-            ))}
-            {provided.placeholder}
+            {leads.length > 0 && (
+              <div style={{ height: rowVirtualizer.getTotalSize(), position: 'relative', width: '100%' }}>
+                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                  const lead = leads[virtualRow.index];
+                  return (
+                    <Draggable
+                      key={lead.id}
+                      draggableId={lead.id}
+                      index={virtualRow.index}
+                    >
+                      {(dragProvided) => (
+                        <div
+                          ref={dragProvided.innerRef}
+                          {...dragProvided.draggableProps}
+                          {...dragProvided.dragHandleProps}
+                          style={{
+                            ...dragProvided.draggableProps.style,
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            transform: `translateY(${virtualRow.start}px)`,
+                          }}
+                        >
+                          <LeadCard
+                            lead={lead}
+                            index={virtualRow.index}
+                            navigate={navigate}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </Droppable>
     </div>
   );
 }
-
-

@@ -10,9 +10,10 @@ interface LeadCardProps {
   lead: Lead;
   index: number;
   navigate: ReturnType<typeof useNavigate>;
+  style?: React.CSSProperties;
 }
 
-export function LeadCard({ lead, index, navigate }: LeadCardProps) {
+export const LeadCard = React.memo(function LeadCard({ lead, index, navigate, style }: LeadCardProps) {
   const isTerminal = VALID_TRANSITIONS[lead.status].length === 0;
 
   return (
@@ -53,4 +54,4 @@ export function LeadCard({ lead, index, navigate }: LeadCardProps) {
       )}
     </Draggable>
   );
-}
+});
