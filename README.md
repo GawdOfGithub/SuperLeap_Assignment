@@ -20,8 +20,6 @@ This project is built using a modern web development stack, focusing on a respon
     -   A next-generation frontend tooling that provides an extremely fast development experience.
 -   **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/) with [Redux Persist](https://github.com/rt2zz/redux-persist)
     -   Redux Toolkit simplifies Redux development, and Redux Persist enables the application state to be stored in local storage and rehydrated upon page refresh.
--   **Authentication**: [Clerk](https://clerk.com/)
-    -   A complete user management platform for React applications, handling user authentication, organization management, and more.
 -   **Routing**: [React Router DOM](https://reactrouter.com/en/main)
     -   Standard library for routing in React applications.
 -   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
